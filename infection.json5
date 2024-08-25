@@ -9,8 +9,8 @@
         "github": true,
         "text": "infection.log"
     },
-    "minMsi": 80,
-    "minCoveredMsi": 80,
+    "minMsi": 90,
+    "minCoveredMsi": 90,
     "mutators": {
         "@default": true
     }
