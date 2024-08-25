@@ -7,6 +7,7 @@ namespace Tests\Dried\Humanizer;
 use Dried\Humanizer\DateHumanizer;
 use Dried\Humanizer\List\ListJoiner;
 use Dried\Humanizer\List\ListTranslator;
+use Dried\Humanizer\Translation\ArrayDateTranslations;
 use Dried\Humanizer\Translation\EnglishTranslator;
 use Dried\Humanizer\UnitAmount\UnitAmountEnglishHumanizer;
 use Dried\Humanizer\UnitAmount\UnitAmountTranslator;
@@ -98,5 +99,26 @@ final class DateHumanizerTest extends TestCase
             ['1.5 hours', UnitAmount::hours(1.5)],
             ['2 hours', UnitAmount::hours(2)],
         ];
+    }
+
+    public function testEnglishPluralWithRanges(): void
+    {
+        $translator = new EnglishTranslator();
+        $translationsGetter = new ArrayDateTranslations([
+            'hour' => '[10,30]a lot of hours|]30,infinity]too many hours|%count% hour|%count% hours',
+        ]);
+        $humanizer = new DateHumanizer(
+            new UnitAmountTranslator($translator, $translationsGetter),
+            new ListTranslator($translationsGetter),
+        );
+
+
+        self::assertSame('1 hour', $humanizer->unitForHumans(UnitAmount::hours(1)));
+        self::assertSame('2 hours', $humanizer->unitForHumans(UnitAmount::hours(2)));
+        self::assertSame('9 hours', $humanizer->unitForHumans(UnitAmount::hours(9)));
+        self::assertSame('a lot of hours', $humanizer->unitForHumans(UnitAmount::hours(10)));
+        self::assertSame('a lot of hours', $humanizer->unitForHumans(UnitAmount::hours(30)));
+        self::assertSame('too many hours', $humanizer->unitForHumans(UnitAmount::hours(30.1)));
+        self::assertSame('too many hours', $humanizer->unitForHumans(UnitAmount::hours(INF)));
     }
 }
