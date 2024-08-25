@@ -33,7 +33,9 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Run test suite
-        run: composer require --dev infection/infection --no-update
+        run: |
+          composer require --dev infection/infection --no-update
+          composer config --no-plugins allow-plugins.infection/extension-installer true
 
       - name: Cache composer dependencies
         uses: actions/cache@v4
