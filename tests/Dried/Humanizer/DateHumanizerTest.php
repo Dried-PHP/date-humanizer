@@ -7,6 +7,7 @@ namespace Tests\Dried\Humanizer;
 use Dried\Humanizer\DateHumanizer;
 use Dried\Humanizer\List\ListJoiner;
 use Dried\Humanizer\List\ListTranslator;
+use Dried\Humanizer\Translation\EnglishTranslator;
 use Dried\Humanizer\UnitAmount\UnitAmountEnglishHumanizer;
 use Dried\Humanizer\UnitAmount\UnitAmountTranslator;
 use Dried\Translation\DateTranslations;
@@ -72,6 +73,30 @@ final class DateHumanizerTest extends TestCase
             ['en', '1.5 hours', UnitAmount::hours(1.5)],
             ['fr', '2 heures', UnitAmount::hours(2)],
             ['en', '2 hours', UnitAmount::hours(2)],
+        ];
+    }
+
+
+    #[DataProvider('getEnglishPluralCases')]
+    public function testEnglishPlural(string $expected, UnitAmount $unitAmount): void
+    {
+        $translator = new EnglishTranslator();
+        $translationsGetter = DateTranslations::forLocale('en');
+        $humanizer = new DateHumanizer(
+            new UnitAmountTranslator($translator, $translationsGetter),
+            new ListTranslator($translationsGetter),
+        );
+
+        self::assertSame($expected, $humanizer->unitForHumans($unitAmount));
+    }
+
+    public static function getEnglishPluralCases(): array
+    {
+        return [
+            ['0 hours', UnitAmount::hours(0)],
+            ['1 hour', UnitAmount::hours(1)],
+            ['1.5 hours', UnitAmount::hours(1.5)],
+            ['2 hours', UnitAmount::hours(2)],
         ];
     }
 }

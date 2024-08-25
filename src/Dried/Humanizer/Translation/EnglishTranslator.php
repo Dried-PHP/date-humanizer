@@ -30,19 +30,17 @@ final readonly class EnglishTranslator implements TranslatorInterface
 
     private function getVariant(string $id, array $parameters): string
     {
-        if (isset($parameters['%count%'])) {
-            $parameters[':count'] = $parameters['%count%'];
-        }
+        $count = $parameters['%count%'] ?? $parameters[':count'] ?? null;
 
-        if (!isset($parameters[':count'])) {
+        if ($count === null) {
             return $id;
         }
 
-        $count = (float) $parameters[':count'];
+        $count = (float) $count;
         $skippedMatch = 0;
 
         foreach (explode('|', $id) as $index => $variant) {
-            if (preg_match('/^\{(inf|infinity\d+(?:\.\d+)?)}(.*)$/i', $variant, $matches)) {
+            if (preg_match('/^\{(inf|infinity|\d+(?:\.\d+)?)}(.*)$/i', $variant, $matches)) {
                 if ($this->parseFloat($matches[1]) === $count) {
                     return $matches[2];
                 }
@@ -52,7 +50,7 @@ final readonly class EnglishTranslator implements TranslatorInterface
                 continue;
             }
 
-            if (preg_match('/^([\[\]])(inf|infinity\d+(?:\.\d+)?),(inf|infinity\d+(?:\.\d+)?)([\[\]])(.*)$/', $variant, $matches)) {
+            if (preg_match('/^(\[|])(inf|infinity|\d+(?:\.\d+)?),(inf|infinity|\d+(?:\.\d+)?)(\[|])(.*)$/i', $variant, $matches)) {
                 $min = $this->parseFloat($matches[2]);
                 $max = $this->parseFloat($matches[3]);
 
