@@ -60,7 +60,7 @@ final readonly class UnitAmountTranslator implements UnitAmountStringifier
             throw new RuntimeException(
                 NumberFormatter::class . ' is needed to format decimal number, ' .
                 'you may install it via either PHP intl extension (ext-intl) or ' .
-                'symfony/polyfill-intl-icu composer package.',
+                'symfony/polyfill-intl-icu composer package (English-only).',
             );
         }
 
