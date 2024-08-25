@@ -113,7 +113,6 @@ final class DateHumanizerTest extends TestCase
             new ListTranslator($translationsGetter),
         );
 
-
         self::assertSame('1 hour', $humanizer->unitForHumans(UnitAmount::hours(1)));
         self::assertSame('2 hours', $humanizer->unitForHumans(UnitAmount::hours(2)));
         self::assertSame('9 hours', $humanizer->unitForHumans(UnitAmount::hours(9)));
