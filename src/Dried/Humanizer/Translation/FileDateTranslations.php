@@ -10,7 +10,7 @@ final class FileDateTranslations implements DateTranslationsGetter
 {
     private ?array $translations = null;
 
-    private function __construct(
+    public function __construct(
         public readonly string $file,
     ) {
     }

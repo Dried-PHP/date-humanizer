@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Tests\Dried\Humanizer;
 
 use Dried\Humanizer\DateHumanizer;
+use Dried\Humanizer\Exception\MissingTranslation;
 use Dried\Humanizer\List\ListJoiner;
 use Dried\Humanizer\List\ListTranslator;
 use Dried\Humanizer\Translation\ArrayDateTranslations;
 use Dried\Humanizer\Translation\EnglishTranslator;
+use Dried\Humanizer\Translation\FileDateTranslations;
 use Dried\Humanizer\UnitAmount\UnitAmountEnglishHumanizer;
 use Dried\Humanizer\UnitAmount\UnitAmountTranslator;
 use Dried\Translation\DateTranslations;
@@ -152,5 +154,37 @@ final class DateHumanizerTest extends TestCase
         );
 
         $humanizer->unitForHumans(UnitAmount::hours(9));
+    }
+
+    public function testMissingKey(): void
+    {
+        $missingTranslation = MissingTranslation::forKey('day');
+
+        self::assertSame("Translation for 'day' is not found.", $missingTranslation->getMessage());
+
+        self::expectExceptionObject($missingTranslation);
+
+        $translator = new EnglishTranslator();
+        $translationsGetter = new ArrayDateTranslations([
+            'hour' => '[10,30]a lot of hours|]30,infinity]too many hours',
+        ]);
+        $humanizer = new DateHumanizer(
+            new UnitAmountTranslator($translator, $translationsGetter),
+            new ListTranslator($translationsGetter),
+        );
+
+        $humanizer->unitForHumans(UnitAmount::days(9));
+    }
+
+    public function testTranslationFile(): void
+    {
+        $translator = new EnglishTranslator();
+        $translationsGetter = new FileDateTranslations(__DIR__ . '/../../Fixtures/en.php');
+        $humanizer = new DateHumanizer(
+            new UnitAmountTranslator($translator, $translationsGetter),
+            new ListTranslator($translationsGetter),
+        );
+
+        self::assertSame('9 months', $humanizer->unitForHumans(UnitAmount::months(9)));
     }
 }

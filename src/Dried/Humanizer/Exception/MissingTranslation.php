@@ -10,6 +10,6 @@ final class MissingTranslation extends RuntimeException
 {
     public static function forKey(string $key): self
     {
-        return new self("Translation for $key is not found.");
+        return new self("Translation for '$key' is not found.");
     }
 }

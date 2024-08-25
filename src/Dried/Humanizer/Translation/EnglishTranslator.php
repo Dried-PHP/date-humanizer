@@ -38,6 +38,7 @@ final readonly class EnglishTranslator implements TranslatorInterface
 
         $count = (float) $count;
         $skippedMatch = 0;
+        $singularVariant = null;
 
         foreach (explode('|', $id) as $index => $variant) {
             if (preg_match('/^\{(inf|infinity|\d+(?:\.\d+)?)}(.*)$/i', $variant, $matches)) {
@@ -75,9 +76,13 @@ final readonly class EnglishTranslator implements TranslatorInterface
             if ($isSingular === $expectSingular) {
                 return $variant;
             }
+
+            if ($expectSingular) {
+                $singularVariant = $variant;
+            }
         }
 
-        throw new RuntimeException(
+        return $singularVariant ?? throw new RuntimeException(
             'Unable to choose a translation for "' . $id . '" with locale for value ' . $count,
         );
     }
