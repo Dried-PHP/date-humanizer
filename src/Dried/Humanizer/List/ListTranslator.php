@@ -34,9 +34,8 @@ final readonly class ListTranslator implements ListStringifier
             return implode('', $list);
         }
 
-        [$default, $last] = array_pad($glues, 2, null);
-        $default ??= ' ';
-        $last ??= $default;
+        $default = $glues[0] ?? ' ';
+        $last = $glues[1] ?? $default;
         $end = array_pop($list);
 
         return implode($default, $list) . $last . $end;

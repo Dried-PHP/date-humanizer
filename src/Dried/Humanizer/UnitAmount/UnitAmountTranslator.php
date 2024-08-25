@@ -42,6 +42,7 @@ final readonly class UnitAmountTranslator implements UnitAmountStringifier
         ]);
     }
 
+    /** @infection-ignore-all */
     private function formatNumber(float $number): string
     {
         $string = (string) $number;

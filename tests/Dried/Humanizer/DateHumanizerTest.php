@@ -125,6 +125,24 @@ final class DateHumanizerTest extends TestCase
 
         $translator = new EnglishTranslator();
         $translationsGetter = new ArrayDateTranslations([
+            'hour' => '{8}not enough|]10,30]a lot of hours|]30,infinity[too many hours|%count% hour|%count% hours',
+        ]);
+        $humanizer = new DateHumanizer(
+            new UnitAmountTranslator($translator, $translationsGetter),
+            new ListTranslator($translationsGetter),
+        );
+
+        self::assertSame('1 hour', $humanizer->unitForHumans(UnitAmount::hours(1)));
+        self::assertSame('2 hours', $humanizer->unitForHumans(UnitAmount::hours(2)));
+        self::assertSame('9 hours', $humanizer->unitForHumans(UnitAmount::hours(9)));
+        self::assertSame('10 hours', $humanizer->unitForHumans(UnitAmount::hours(10)));
+        self::assertSame('a lot of hours', $humanizer->unitForHumans(UnitAmount::hours(10.1)));
+        self::assertSame('a lot of hours', $humanizer->unitForHumans(UnitAmount::hours(30)));
+        self::assertSame('too many hours', $humanizer->unitForHumans(UnitAmount::hours(30.1)));
+        self::assertSame('∞ hours', $humanizer->unitForHumans(UnitAmount::hours(INF)));
+
+        $translator = new EnglishTranslator();
+        $translationsGetter = new ArrayDateTranslations([
             'hour' => '[10,30]a lot of hours|]30,infinity]too many hours',
         ]);
         $humanizer = new DateHumanizer(
@@ -136,6 +154,30 @@ final class DateHumanizerTest extends TestCase
         self::assertSame('a lot of hours', $humanizer->unitForHumans(UnitAmount::hours(30)));
         self::assertSame('too many hours', $humanizer->unitForHumans(UnitAmount::hours(30.1)));
         self::assertSame('too many hours', $humanizer->unitForHumans(UnitAmount::hours(INF)));
+
+        $translator = new EnglishTranslator();
+        $translationsGetter = new ArrayDateTranslations([
+            'hour' => 'square-bracket[10,30]|curly-bracket{1}',
+        ]);
+        $humanizer = new DateHumanizer(
+            new UnitAmountTranslator($translator, $translationsGetter),
+            new ListTranslator($translationsGetter),
+        );
+
+        self::assertSame('square-bracket[10,30]', $humanizer->unitForHumans(UnitAmount::hours(1)));
+        self::assertSame('curly-bracket{1}', $humanizer->unitForHumans(UnitAmount::hours(2)));
+
+        $translator = new EnglishTranslator();
+        $translationsGetter = new ArrayDateTranslations([
+            'hour' => '{INF}too much|fine',
+        ]);
+        $humanizer = new DateHumanizer(
+            new UnitAmountTranslator($translator, $translationsGetter),
+            new ListTranslator($translationsGetter),
+        );
+
+        self::assertSame('too much', $humanizer->unitForHumans(UnitAmount::hours(INF)));
+        self::assertSame('fine', $humanizer->unitForHumans(UnitAmount::hours(99999999)));
     }
 
     public function testMissingTranslation(): void

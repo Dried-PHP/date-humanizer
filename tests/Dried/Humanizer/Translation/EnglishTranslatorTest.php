@@ -29,4 +29,17 @@ final class EnglishTranslatorTest extends TestCase
 
         self::assertSame('foo', $translator->trans('foo'));
     }
+
+    public function testNewReplacementSyntaxHasPrecedence(): void
+    {
+        $translator = new EnglishTranslator();
+
+        self::assertSame('foo', $translator->trans('foo|bar', [
+            ':count' => 2,
+            '%count%' => 1,
+        ]));
+        self::assertSame('bar', $translator->trans('foo|bar', [
+            ':count' => 2,
+        ]));
+    }
 }
