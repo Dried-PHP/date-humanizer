@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dried\Humanizer\Translation;
 
 use InvalidArgumentException;
+use RuntimeException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class EnglishTranslator implements TranslatorInterface
@@ -78,7 +79,7 @@ final readonly class EnglishTranslator implements TranslatorInterface
             }
         }
 
-        throw new InvalidArgumentException(
+        throw new RuntimeException(
             'Unable to choose a translation for "' . $id . '" with locale for value ' . $count,
         );
     }

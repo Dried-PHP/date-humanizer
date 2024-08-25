@@ -8,7 +8,7 @@ use Dried\Contracts\Translation\DateTranslationsGetter;
 
 final readonly class ArrayDateTranslations implements DateTranslationsGetter
 {
-    private function __construct(private array $translations)
+    public function __construct(private array $translations)
     {
     }
 
