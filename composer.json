@@ -1,0 +1,37 @@
+{
+    "name": "dried/date-humanizer",
+    "description": "Format dates for humans",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "kylekatarnls",
+            "email": "kylekatarnls@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^8.2",
+        "dried/date-contracts": "dev-main",
+        "dried/date-utils": "dev-main",
+        "symfony/translation-contracts": "^3.5"
+    },
+    "require-dev": {
+        "dried/date-translations": "dev-main",
+        "phpunit/phpunit": "^11.2",
+        "symfony/polyfill-intl-icu": "^1.30",
+        "symfony/translation": "^7.1"
+    },
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Dried\\Contracts\\": "src/Dried/Contracts/",
+            "Dried\\Humanizer\\": "src/Dried/Humanizer/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    }
+}
