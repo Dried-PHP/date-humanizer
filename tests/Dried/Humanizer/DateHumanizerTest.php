@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Dried\Difference;
+namespace Tests\Dried\Humanizer;
 
 use Dried\Humanizer\DateHumanizer;
 use Dried\Humanizer\List\ListJoiner;
