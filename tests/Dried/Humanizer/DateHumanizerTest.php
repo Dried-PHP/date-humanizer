@@ -125,7 +125,7 @@ final class DateHumanizerTest extends TestCase
 
         $translator = new EnglishTranslator();
         $translationsGetter = new ArrayDateTranslations([
-            'hour' => '{8}not enough|[10,30]a lot of hours|]30,infinity[too many hours|%count% hour|%count% hours',
+            'hour' => '{8}not enough|]10,30]a lot of hours|]30,infinity[too many hours|%count% hour|%count% hours',
         ]);
         $humanizer = new DateHumanizer(
             new UnitAmountTranslator($translator, $translationsGetter),
@@ -135,7 +135,8 @@ final class DateHumanizerTest extends TestCase
         self::assertSame('1 hour', $humanizer->unitForHumans(UnitAmount::hours(1)));
         self::assertSame('2 hours', $humanizer->unitForHumans(UnitAmount::hours(2)));
         self::assertSame('9 hours', $humanizer->unitForHumans(UnitAmount::hours(9)));
-        self::assertSame('a lot of hours', $humanizer->unitForHumans(UnitAmount::hours(10)));
+        self::assertSame('10 hours', $humanizer->unitForHumans(UnitAmount::hours(10)));
+        self::assertSame('a lot of hours', $humanizer->unitForHumans(UnitAmount::hours(10.1)));
         self::assertSame('a lot of hours', $humanizer->unitForHumans(UnitAmount::hours(30)));
         self::assertSame('too many hours', $humanizer->unitForHumans(UnitAmount::hours(30.1)));
         self::assertSame('∞ hours', $humanizer->unitForHumans(UnitAmount::hours(INF)));

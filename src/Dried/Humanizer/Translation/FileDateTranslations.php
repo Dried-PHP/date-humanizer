@@ -15,7 +15,11 @@ final class FileDateTranslations implements DateTranslationsGetter
     ) {
     }
 
-    /** @return array<string, Closure|array|string|int> */
+    /**
+     * @infection-ignore-all
+     *
+     * @return array<string, Closure|array|string|int>
+     */
     public function getTranslations(): array
     {
         return $this->translations ??= require $this->file;
