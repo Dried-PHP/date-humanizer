@@ -15,6 +15,7 @@ use Dried\Translation\DateTranslations;
 use Dried\Utils\UnitAmount;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Translator;
 
@@ -120,5 +121,37 @@ final class DateHumanizerTest extends TestCase
         self::assertSame('a lot of hours', $humanizer->unitForHumans(UnitAmount::hours(30)));
         self::assertSame('too many hours', $humanizer->unitForHumans(UnitAmount::hours(30.1)));
         self::assertSame('too many hours', $humanizer->unitForHumans(UnitAmount::hours(INF)));
+
+        $translator = new EnglishTranslator();
+        $translationsGetter = new ArrayDateTranslations([
+            'hour' => '[10,30]a lot of hours|]30,infinity]too many hours',
+        ]);
+        $humanizer = new DateHumanizer(
+            new UnitAmountTranslator($translator, $translationsGetter),
+            new ListTranslator($translationsGetter),
+        );
+
+        self::assertSame('a lot of hours', $humanizer->unitForHumans(UnitAmount::hours(10)));
+        self::assertSame('a lot of hours', $humanizer->unitForHumans(UnitAmount::hours(30)));
+        self::assertSame('too many hours', $humanizer->unitForHumans(UnitAmount::hours(30.1)));
+        self::assertSame('too many hours', $humanizer->unitForHumans(UnitAmount::hours(INF)));
+    }
+
+    public function testMissingTranslation(): void
+    {
+        self::expectExceptionObject(new RuntimeException(
+            'Unable to choose a translation for "[10,30]a lot of hours|]30,infinity]too many hours" with locale for value 9',
+        ));
+
+        $translator = new EnglishTranslator();
+        $translationsGetter = new ArrayDateTranslations([
+            'hour' => '[10,30]a lot of hours|]30,infinity]too many hours',
+        ]);
+        $humanizer = new DateHumanizer(
+            new UnitAmountTranslator($translator, $translationsGetter),
+            new ListTranslator($translationsGetter),
+        );
+
+        $humanizer->unitForHumans(UnitAmount::hours(9));
     }
 }
