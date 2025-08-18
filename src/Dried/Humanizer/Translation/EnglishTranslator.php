@@ -41,7 +41,7 @@ final readonly class EnglishTranslator implements TranslatorInterface
         $singularVariant = null;
 
         foreach (explode('|', $id) as $index => $variant) {
-            if (preg_match('/^\{(inf|infinity|\d+(?:\.\d+)?)}/i', $variant, $matches)) {
+            if (preg_match('/^\{(-?(?:inf|infinity|\d+(?:\.\d+)?))}/i', $variant, $matches)) {
                 if ($this->parseFloat($matches[1]) === $count) {
                     return substr($variant, \strlen($matches[0]));
                 }
@@ -51,7 +51,7 @@ final readonly class EnglishTranslator implements TranslatorInterface
                 continue;
             }
 
-            if (preg_match('/^(\[|])(inf|infinity|\d+(?:\.\d+)?),(inf|infinity|\d+(?:\.\d+)?)(\[|])/i', $variant, $matches)) {
+            if (preg_match('/^(\[|])(-?(?:inf|infinity|\d+(?:\.\d+)?)),(-?(?:inf|infinity|\d+(?:\.\d+)?))(\[|])/i', $variant, $matches)) {
                 $min = $this->parseFloat($matches[2]);
                 $max = $this->parseFloat($matches[3]);
 
@@ -90,6 +90,7 @@ final readonly class EnglishTranslator implements TranslatorInterface
     private function parseFloat(string $number): float
     {
         return match (strtolower($number)) {
+            '-inf', '-infinity' => -INF,
             'inf', 'infinity' => INF,
             default => (float) $number,
         };
