@@ -41,5 +41,9 @@ final class EnglishTranslatorTest extends TestCase
         self::assertSame('bar', $translator->trans('foo|bar', [
             ':count' => 2,
         ]));
+        self::assertSame('foo|bar', $translator->trans('foo|bar'));
+        self::assertSame('foo|bar', $translator->trans('foo|bar', [
+            ':count' => null,
+        ]));
     }
 }
