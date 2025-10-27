@@ -16,10 +16,12 @@ use Dried\Humanizer\UnitAmount\UnitAmountTranslator;
 use Dried\Translation\DateTranslations;
 use Dried\Utils\UnitAmount;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Translator;
+use Throwable;
 
 final class DateHumanizerTest extends TestCase
 {
@@ -180,6 +182,28 @@ final class DateHumanizerTest extends TestCase
         self::assertSame('fine', $humanizer->unitForHumans(UnitAmount::hours(99999999)));
     }
 
+    #[TestWith(['[-infinity,-1]past|{0}present|[1,infinity]future'])]
+    #[TestWith(['[-inf,-0.9]past|{0}present|[0.9,inf]future'])]
+    public function testEnglishPluralWithNegativeValues(string $id): void
+    {
+        $translator = new EnglishTranslator();
+        $translationsGetter = new ArrayDateTranslations(['hour' => $id]);
+        $humanizer = new DateHumanizer(
+            new UnitAmountTranslator($translator, $translationsGetter),
+            new ListTranslator($translationsGetter),
+        );
+
+        self::assertSame('past', $humanizer->unitForHumans(UnitAmount::hours(-INF)));
+        self::assertSame('past', $humanizer->unitForHumans(UnitAmount::hours(-2)));
+        self::assertSame('past', $humanizer->unitForHumans(UnitAmount::hours(-1)));
+        self::assertUnableToChoose($humanizer, UnitAmount::hours(-0.5));
+        self::assertSame('present', $humanizer->unitForHumans(UnitAmount::hours(0)));
+        self::assertUnableToChoose($humanizer, UnitAmount::hours(0.5));
+        self::assertSame('future', $humanizer->unitForHumans(UnitAmount::hours(1)));
+        self::assertSame('future', $humanizer->unitForHumans(UnitAmount::hours(2)));
+        self::assertSame('future', $humanizer->unitForHumans(UnitAmount::hours(INF)));
+    }
+
     public function testMissingTranslation(): void
     {
         self::expectExceptionObject(new RuntimeException(
@@ -228,5 +252,30 @@ final class DateHumanizerTest extends TestCase
         );
 
         self::assertSame('9 months', $humanizer->unitForHumans(UnitAmount::months(9)));
+    }
+
+    private static function assertUnableToChoose(DateHumanizer $humanizer, UnitAmount $amount): void
+    {
+        try {
+            $result = $humanizer->unitForHumans($amount);
+
+            self::assertNull(
+                $result,
+                "Expected RuntimeException(Unable to choose a translation), Received: $result",
+            );
+        } catch (Throwable $error) {
+            self::assertSame(
+                RuntimeException::class,
+                $error::class,
+                'Expected RuntimeException(Unable to choose a translation), Received: ' . $error->getMessage() .
+                "\n" . $error->getFile() . ':' . $error->getFile() . "\n" . $error->getTraceAsString(),
+            );
+            self::assertMatchesRegularExpression(
+                '/^Unable to choose a translation for "[^"]+" with locale for value ' . $amount->amount . '/',
+                $error->getMessage(),
+                'Expected RuntimeException(Unable to choose a translation), Received: ' . $error->getMessage() .
+                "\n" . $error->getFile() . ':' . $error->getFile() . "\n" . $error->getTraceAsString(),
+            );
+        }
     }
 }
