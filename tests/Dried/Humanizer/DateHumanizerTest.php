@@ -21,10 +21,23 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 final class DateHumanizerTest extends TestCase
 {
+    public function testEnglishStringifiers(): void
+    {
+        $humanizer = DateHumanizer::english();
+
+        self::assertSame('3 hours', $humanizer->unitForHumans(UnitAmount::hours(3)));
+        self::assertSame('1 day, 3 hours and 20 minutes', $humanizer->unitsForHumans([
+            UnitAmount::days(1),
+            UnitAmount::hours(3),
+            UnitAmount::minutes(20),
+        ]));
+    }
+
     public function testFallbackStringifiers(): void
     {
         $humanizer = new DateHumanizer(new UnitAmountEnglishHumanizer(), new ListJoiner());
@@ -39,12 +52,7 @@ final class DateHumanizerTest extends TestCase
 
     public function testTranslations(): void
     {
-        $translator = new Translator('fr');
-        $translationsGetter = DateTranslations::forLocale('fr');
-        $humanizer = new DateHumanizer(
-            new UnitAmountTranslator($translator, $translationsGetter),
-            new ListTranslator($translationsGetter),
-        );
+        $humanizer = self::createDateHumanizerFromSymfonyTranslator(new Translator('fr'));
 
         self::assertSame('3 heures', $humanizer->unitForHumans(UnitAmount::hours(3)));
         self::assertSame('1 jour, 3 heures et 20 minutes', $humanizer->unitsForHumans([
@@ -292,5 +300,14 @@ final class DateHumanizerTest extends TestCase
                 "\n" . $error->getFile() . ':' . $error->getFile() . "\n" . $error->getTraceAsString(),
             );
         }
+    }
+
+    private static function createDateHumanizerFromSymfonyTranslator(
+        TranslatorInterface $translator,
+    ): DateHumanizer {
+        return DateHumanizer::create(
+            $translator,
+            DateTranslations::forLocale($translator->getLocale()),
+        );
     }
 }
