@@ -204,6 +204,21 @@ final class DateHumanizerTest extends TestCase
         self::assertSame('future', $humanizer->unitForHumans(UnitAmount::hours(INF)));
     }
 
+    public function testFormatInfinity(): void
+    {
+        $translator = new EnglishTranslator();
+        $translationsGetter = new ArrayDateTranslations([
+            'day' => '[-infinity,-1]past %count%|[0,infinity]future %count%',
+        ]);
+        $humanizer = new DateHumanizer(
+            new UnitAmountTranslator($translator, $translationsGetter),
+            new ListTranslator($translationsGetter),
+        );
+
+        self::assertSame('past -∞', $humanizer->unitForHumans(UnitAmount::days(-INF)));
+        self::assertSame('future ∞', $humanizer->unitForHumans(UnitAmount::days(INF)));
+    }
+
     public function testMissingTranslation(): void
     {
         self::expectExceptionObject(new RuntimeException(

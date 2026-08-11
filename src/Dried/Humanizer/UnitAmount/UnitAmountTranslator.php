@@ -47,7 +47,7 @@ final readonly class UnitAmountTranslator implements UnitAmountStringifier
     {
         $string = (string) $number;
 
-        if ($string === (string) (int) $number) {
+        if ($number !== INF && $number !== -INF && $string === (string) (int) $number) {
             return $string;
         }
 
